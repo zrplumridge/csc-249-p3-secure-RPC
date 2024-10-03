@@ -15,7 +15,6 @@ SERVER_PORT = args.server_port  # Port to listen on (non-privileged ports are > 
 
 print("server starting - listening for connections at IP", SERVER_IP, "and port", SERVER_PORT)
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((SERVER_IP, SERVER_PORT))
     s.listen()
     conn, addr = s.accept()
