@@ -13,7 +13,7 @@ def _ip_address(x):
 def _port(x):
     x = int(x)
     
-    # Usable port numbers are between 1024 and 65535 inclusive
+    # Usable port numbers are between 1024 and 65535 exclusive
     if x < 1024 or x > 65535:
         raise ArgumentTypeError
     return x
