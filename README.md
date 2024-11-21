@@ -1,25 +1,21 @@
-# CSC 249 – Project 2 – Simple VPN
+# CSC 249 – Project 3 – Secure RPC
 
-For this project, you'll be buidling a VPN server and client that will work with sockets.
+For this project, you'll be buidling upon your previous projects, this time buiding a (simulated) secure client and server, still communicating through a VPN.
 
-I’ve placed some starter code in this Git repo [https://github.com/abpw/csc-249-p2-simple-VPN-server], which you are welcome to clone. Your job will be to fill in the "encode_message()" function in "client.py", the "parse_message()" function in "VPN.py", and fill in the rest of the functionality of a VPN in "VPN.py".
+I’ve placed some starter code in this Git repo [https://github.com/abpw/csc-249-p3-secure-RPC], which you are welcome to clone. Your job will be to fill in the "TLS_handshake_client()" function in "secure_client.py" and the "TLS_handshake_server()" function in "secure_server.py", and, optionally, the "process_message()" function in "secure_server.py()". There are detailed instructions in the comments, and you'll make heavy use of the simulated cryptographic primitives in "cryptography_simulator.py" as well as the certificate authority provided in "certificate_authority.py".
 
-I've also included a slightly modified version of the "echo-server.py" file from project 1 for you to test your VPN with: by default, the echo server, VPN server, and VPN client are configured to run on compatible sockets, but if you'd like to change any ip addresses you can use command line arguments to do so. To use echo-server.py's command line arguments, for example, you can run "python3 echo-server.py --help" from command line in the directory the echo-server.py file is stored.
+Like last time, by default, the server, VPN server, client, and certificate authority are configured to run on compatible sockets, but if you'd like to change any ip addresses or ports you can use command line arguments to do so. To use secure_server.py's command line arguments, for example, you can run "python3 secure_server.py --help" from command line in the directory the secure_server.py file is stored.
 
-Note that all three files must be stored in the same direcory as "arguments.py" to run correctly.
+Note that all four files must be stored in the same direcory as "arguments.py" to run correctly, and the certificate authority should be started before the secure server, and the secure client should be run last.
 
 Although "echo-server.py" is included as a test server, your client and VPN should be able to interact with any server with any functionality that follows this type of protocol:
 
 * Take as input over a socket a message of up to 1000 bytes in a particular format
 * Return to the sender along the same TCP connection a message of up to 1000 bytes (possibly an error message)
 
-For example, you may have created a server like this for your project 1. If you did, and if you type exactly the right format of message as input for the VPN client you'll write in this project, you should be able to interact with your project 1 server as well as echo-server.py. In other words, the protocol you defined in project 1 should allow you to create a new client for this project that is somewhat interoperable with your server from the last project.
-
-Like the echo application, your VPN should terminate after successfully processing a client message, and your client should terminate after successfully receiving a response to its request.
-
 ## Design Requirements
 
-Your server must be able to process at least two different requested operations (i.e., it must understand at least two "verbs"). This means that an indication of the requested operation needs to be passed from client to server.
+Your secure client and secure server should be, well, secure. As the "man in the middle", your VPN should not be able to read any sensitive communications between the secure client and the secure server unless those communications are properly simulated secure. Make sure that 
 
 * Your client must obtain the desired message to be sent through the VPN from the terminal command line. This functionality is already provided in the client.py file.
 * As they run, the client and the VPN applications must generate tracing messages that document significant program milestones, e.g., when connections are made, when messages and sent and received, and what was sent and what was received. (Good examples of tracing messages can be found in the sample code provided.)
@@ -28,15 +24,27 @@ Your server must be able to process at least two different requested operations 
 
 ## Deliverables
 
-Your work on this project must be submitted for grading by **Thursday, October 10th at 11:59PM**. Extensions may be obtained by sending me a message on Slack before the original due date.
+Your work on this project must be submitted for grading by **Monday, December 2nd at 11:59PM**. Extensions may be obtained by sending me a message on Slack before the original due date.
 
 All work must be submitted in Gradescope.
 
 You must submit these work products:
 
-1. Source code for your client and VPN.
-2. A **text** (.txt or .md) document with a written description of your client-VPN message format (that is, a description of all implemented client and VPN messages, and how the various components of each message are represented). Your goal in writing this document should be to convey enough information in enough detail to allow a competent programmer **without access to your source code** to write either a new client that communicates properly with your VPN server, or a new VPN server that communicates properly with your client. This document should include at least **six** sections: Overview of Application, Client->VPN Server Message Format, VPN Server->Client Message Format, Example Output, **a description of how the network layers are interacting when you run your server, VPN server, and client**, and Acknowledgments.
-3. A command-line trace showing the client and server in operation. 
+1. Source code for your secure client and secure server.
+2. A **text** (.txt or .md) document with a written description of your client-VPN message format (that is, a description of all implemented client and VPN messages, and how the various components of each message are represented). Your goal in writing this document should be to convey enough information in enough detail to allow a competent programmer **without access to your source code** to write either a new secure client that communicates properly with your secure server, or a new secure server that communicates properly with your client. This document should include at least **six** sections:
+    1. Overview of Application
+    2. Format of an unsigned certificate
+    3. Example output
+    4. **A walkthorough of the steps of a TLS handshake, and what each step accomplishes**
+        * For example, one step will be: "The client encrypts the generated symmetric key before sending it to the server. If it doesn't, the VPN will be able to read the symmetric key in transit and use it to decrypt further secure communications between the client and server encrypted and HMAC'd with that key."
+    5. A description of two ways in which our simulation fails to achieve real security, and how these failures might be exploited by a malicious party. This is one place you can earn extra credit by discussing some less-obvious exploits. Some options for discussion are:
+        * The asymmetric key generation scheme
+        * The encryption/decryption/HMAC/verification algorithms
+        * The certificate authority's public key distribution system
+        * The use of python's "eval()" function
+    6. Acknowledgements
+    7. (Optional) Client->Server and Server->Client application layer message format if you decide to change "process_message()" in "secure_server.py". This can be another source of extra credit if you're creative with your application.
+3. Command-line traces showing the secure client, VPN, secure server, and certificate authority in operation.
 
 ## Teamwork Policy
 
@@ -44,7 +52,7 @@ You must submit these work products:
 
 ## Grading Rubric
 
-Your work on this project will be graded on a five-point scale. Fractional points may be awarded.
+Your work on this project will be graded on a five-point scale. Fractional points and extra credit may be awarded.
 
 _0 pts:_ No deliverables were received by the due date or requested extension date.
 
