@@ -13,8 +13,8 @@ parser.add_argument('--CA_port', help='Port number at which to host the certific
 parser.add_argument('--public_key', default=None, type=arguments._public_key, help='Public key for the certificate authority as a tuple')
 args = parser.parse_args()
 
-CA_IP = args.server_IP  # Address to listen on
-CA_PORT = args.server_port  # Port to listen on (non-privileged ports are > 1023)
+CA_IP = args.CA_IP  # Address to listen on
+CA_PORT = args.CA_port  # Port to listen on (non-privileged ports are > 1023)
 
 # Use a random public key if none if provided
 if args.public_key == None:
@@ -27,9 +27,9 @@ def sign_certificate(certificate):
 
 print("Certificate authority starting - listening for connections at IP", CA_IP, "and port", CA_PORT)
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.bind((CA_IP, CA_PORT))
     try:
         while True:
-            s.bind((CA_IP, CA_PORT))
             s.listen()
             conn, addr = s.accept()
             with conn:
