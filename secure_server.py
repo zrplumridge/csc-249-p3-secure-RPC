@@ -13,6 +13,9 @@ parser.add_argument('--CA_IP', help='IP address at which the certificate authori
 parser.add_argument('--CA_port', help='Port number at which the certificate authority is hosted', **arguments.CA_port_arg)
 args = parser.parse_args()
 
+SERVER_IP = args.server_IP  # Address to listen on
+SERVER_PORT = args.server_port  # Port to listen on (non-privileged ports are > 1023)
+
 ### Instructions ###
 # In order to execute TLS with a client, a server needs to do the
 # following once, before accepting incoming connections:
@@ -51,9 +54,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.sendall(bytes('done', 'utf-8'))
 
 print(f"Received signed certificate '{signed_certificate}' from the certificate authority")
-
-SERVER_IP = args.server_IP  # Address to listen on
-SERVER_PORT = args.server_port  # Port to listen on (non-privileged ports are > 1023)
 
 def TLS_handshake_server(connection):
     ## Instructions ##

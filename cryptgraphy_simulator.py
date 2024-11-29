@@ -19,10 +19,10 @@ def public_key_encrypt(key, message):
 
 # call this function to decrypt with a private key
 def private_key_decrypt(key, cyphertext):
-    if len(cyphertext) < 6 or cyphertext[:12] != 'E_(' or ')[' not in cyphertext or cyphertext[-1] != ']':
+    if len(cyphertext) < 6 or cyphertext[:3] != 'E_(' or ')[' not in cyphertext or cyphertext[-1] != ']':
         raise AssertionError('"{}" is not formatted as an asymmetric cyphertext'.format(cyphertext))
     # using eval is very bad practice. can you guess why?
-    public_key = eval(cyphertext[3:cyphertext.index(')[')+1])
+    public_key = eval(cyphertext[2:cyphertext.index(')[')+1])
     if type(public_key) != tuple or type(public_key[0]) != int or type(public_key[1]) != int:
         raise AssertionError('"{}" does not have a properly formatted asymmetric key'.format(cyphertext))
     if public_key[0]+key != public_key[1]:
@@ -62,7 +62,8 @@ def symmetric_decrypt(key, cyphertext):
 
 # use this to generate a simulated HMAC
 def generate_HMAC(key, message):
-    return hash(str(key) + message)
+    prng = random.Random(str(key) + message)
+    return prng.randrange(1, 100000)
 
 ## post-handshake TLS ##
 
