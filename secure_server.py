@@ -28,7 +28,7 @@ SERVER_PORT = args.server_port  # Port to listen on (non-privileged ports are > 
 
 # Format and return a certificate containing the server's socket information and public key
 def format_certificate(public_key):
-    unsigned_certificate = '' # replace this line
+    unsigned_certificate = str(SERVER_IP) + ' IP ' + str(SERVER_PORT) + ' PORT ' + str(public_key) + ' PUBKEY' 
     print(f"Prepared the formatted unsigned certificate '{unsigned_certificate}'")
     return unsigned_certificate
 
@@ -55,14 +55,22 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
 print(f"Received signed certificate '{signed_certificate}' from the certificate authority")
 
-def TLS_handshake_server(connection):
+def TLS_handshake_server(connection, signed_certificate):
     ## Instructions ##
     # Fill this function in with the TLS handshake:
     #  * Send a signed certificate to the client
+    connection.sendall(bytes(signed_certificate, 'utf-8'))
+    data = connection.recv(1024)
+    if not data:
+        print("Encrypted symmetric key not received from client")
+        #break
+    encrypted_symmetric_key = data.decode('utf-8')
+    print("Encrypted symmetric key received from client")
+    symmetric_key = cryptgraphy_simulator.private_key_decrypt
     #    * A signed certificate variable should be available as 'signed_certificate'
     #  * Receive an encrypted symmetric key from the client
     #  * Return the symmetric key for use in further communications with the client
-    return 0
+    return symmetric_key
 
 def process_message(message):
     # Change this function to change the service your server provides
@@ -76,7 +84,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     conn, addr = s.accept()
     with conn:
         print(f"Connected established with {addr}")
-        symmetric_key = TLS_handshake_server(conn)
+        symmetric_key = TLS_handshake_server(conn, signed_certificate)
         while True:
             data = conn.recv(1024)
             if not data:
