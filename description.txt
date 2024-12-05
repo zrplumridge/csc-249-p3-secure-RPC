@@ -15,10 +15,22 @@ TODO -------once it runs, screenshot of code running with input------
 
 4. **A walkthorough of the steps of a TLS handshake, and what each step accomplishes**
         * For example, one step will be: "The client encrypts the generated symmetric key before sending it to the server. If it doesn't, the VPN will be able to read the symmetric key in transit and use it to decrypt further secure communications between the client and server encrypted and HMAC'd with that key."
-server and client both get public key from certificate authority
-server reaches out to certificate authority
 
-client reaches out to server (in this case, through a vpn)
+all communications between client and server are through a VPN to protect the client's privacy. 
+
+server and client both get public key from certificate authority. this allows decoding of messages from the certificate authority including signed certificates. 
+server creates an unsigned certificate with its port, IP, and public key. this contains the information to confirm the identity of the server. 
+server reaches out to certificate authority to ask for the unsigned certificate to be signed. 
+certificate authority encrypts the certificate with its public key and returns the signed certificate to the server. 
+
+client reaches out to server (in this case, through a vpn) to ask for the signed certificate. (this functionally initializes the TLS handshake, but the previous steps are necessary to set it up first)
+server returns the signed certificate to the client
+client decodes the signed certificate using the certificate authority's public key, resulting in the unsigned certificate 
+client compares the contents of the certificate (the IP and port) to that of the server it was receiving information from. (authentification)
+client also now has the server's public key. this was enclosed within the certificate to prevent intermediates from accessing the server's public key, which would allow said intermediate to decrypt other messages. 
+
+client generates a symmetric key for future use. client uses server's public key to encrypt the symmetric key and send it to the server. again to prevent intermediates from gaining access to the symmetric key (VPN here would be the biggest concern)
+all future messages between the two are encrypted using this symmetric key. 
 
 
 5. A description of two ways in which our simulation fails to achieve real security, and how these failures might be exploited by a malicious party. This is one place you can earn extra credit by discussing some less-obvious exploits. Some options for discussion are:
@@ -29,7 +41,12 @@ client reaches out to server (in this case, through a vpn)
     To begin with, all of the relevant documents are in the same folder with limited divides. 
     Therefore, if one had access to one document, one would most likely have access to all of the documents and therefore even more easily be able to pick out the other weak links. 
 
+This asymmetric key generation method can be reproduced.
+An unsigned certificate could contain a (small) virus that could take down the certificate authority, or if the CA has preventative methods in place, be eventually sent to the client. 
+It would not automatically be clear that it's a virus due to encryption. 
+Other parties could gain access to a signed certificate, use the CA's public key to decode it, and therefore have access to the server's public key. This would allow them to decode symmetric codes sent to the server. 
 
 6. Acknowledgements
 Thank you to the class as a whole for bringing up errors so we could figure out some were just inherent to the problem or the given code. 
 I confirmed with some specific classmates the steps we're doing but I don't know their names unfortunately. 
+https://www.ibm.com/docs/en/ibm-mq/9.3?topic=tls-overview-ssltls-handshake to confirm I had all of the steps (their list is much more detailed than this simulation)
