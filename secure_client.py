@@ -38,8 +38,9 @@ if not args.CA_public_key:
         # close the connection with the certificate authority
         s.sendall(bytes('done', 'utf-8'))
     print(f"Received public key {CA_public_key} from the certificate authority for verifying certificates")
+    CA_public_key = eval(CA_public_key)
 else:
-    CA_public_key = args.CA_public_key
+    CA_public_key = eval(args.CA_public_key)
 
 # Add an application-layer header to the message that the VPN can use to forward it
 def encode_message(message):
@@ -49,9 +50,11 @@ def encode_message(message):
 def TLS_handshake_client(connection, server_ip=SERVER_IP, server_port=SERVER_PORT):
     ## Instructions ##
     # Fill this function in with the TLS handshake:
-    #  * Receive a signed certificate from the server
+   
+    #  * Request a TLS handshake from the server
     print("Attempting TLS handshake")
     connection.sendall(bytes(encode_message(" "), 'utf-8'))
+     #  * Receive a signed certificate from the server
     data = connection.recv(1024)
     if not data:
         print('Signed certificate not received')
@@ -92,12 +95,15 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((VPN_IP, VPN_PORT))
     print("VPN connection successful.")
     symmetric_key = TLS_handshake_client(s, SERVER_IP, SERVER_PORT)
-    MSG = encode_message(cryptgraphy_simulator.tls_encode(symmetric_key, MSG))
-    print(f"connection established, sending message '{MSG}'")
-    s.sendall(bytes(MSG, 'utf-8'))
-    print("message sent, waiting for reply")
+    print(f"TLS handshake complete: sent symmetric key '{symmetric_key}', waiting for acknowledgement")
     data = s.recv(1024).decode('utf-8')
+    print(f"Received acknowledgement '{cryptgraphy_simulator.symmetric_decrypt(symmetric_key, data)}', preparing to send message")
+    MSG = cryptgraphy_simulator.tls_encode(symmetric_key,MSG)
+    print(f"Sending message '{MSG}' to the server")
+    s.sendall(bytes(MSG, 'utf-8'))
+    print("Message sent, waiting for reply")
+    data = s.recv(1024)
 
 print(f"Received raw response: '{data}' [{len(data)} bytes]")
-print(f"Decoded message {cryptgraphy_simulator.tls_decode(symmetric_key, data)} from server")
+print(f"Decoded message '{cryptgraphy_simulator.tls_decode(symmetric_key, data.decode('utf-8'))} from server")
 print("client is done!")

@@ -2,6 +2,41 @@ import random
 
 #### DO NOT CHANGE ANY OF THESE FUNCTIONS! ####
 
+# an attempt at type-safety
+def _to_str(x):
+    if type(x) == str:
+        return x
+    if type(x) == bytes:
+        return x.decode('utf-8')
+    if type(x) == int:
+        return str(x)
+    try:
+        return str(x)
+    except ValueError:
+        raise AssertionError(f"'{x}' (of type '{type(x)}') cannot be converted to a string")
+
+def _to_int(x):
+    if type(x) == int:
+        return x
+    if type(x) == bytes:
+        x = _to_str(x)
+    try:
+        return int(x)
+    except ValueError:
+        raise AssertionError(f"'{x}' (of type '{type(x)}') cannot be converted to an int")
+    
+def _to_public_key(x):
+    if type(x) == bytes:
+        x = _to_str(x)
+    if type(x) == str:
+        x = eval(x)
+    if type(x) == tuple:
+        assert len(x) == 2, f"{x} has the wrong number ({len(x)}) of elements to be a public key: requires 2"
+        return (_to_int(x[0]), _to_int(x[1]))
+
+def generate_nonce() -> int:
+    return random.randint(1, 99999)
+
 def generate_nonce():
     return random.randint(1, 99999)
 
@@ -14,11 +49,13 @@ def asymmetric_key_gen(p=56533) -> tuple[tuple[int, int], int]:
     return (public_key, private_key)
 
 # call this function to encrypt with a public key
-def public_key_encrypt(key, message):
-    return "E_" + str(key) + '[' + str(message) + ']'
+def public_key_encrypt(key, message) -> str:
+    key = _to_public_key(key); message = _to_str(message)
+    return "E_" + str(key) + '[' + message + ']'
 
 # call this function to decrypt with a private key
-def private_key_decrypt(key, cyphertext):
+def private_key_decrypt(key, cyphertext) -> str:
+    key = _to_int(key); cyphertext = _to_str(cyphertext)
     if len(cyphertext) < 6 or cyphertext[:3] != 'E_(' or ')[' not in cyphertext or cyphertext[-1] != ']':
         raise AssertionError('"{}" is not formatted as an asymmetric cyphertext'.format(cyphertext))
     # using eval is very bad practice. can you guess why?
@@ -32,7 +69,8 @@ def private_key_decrypt(key, cyphertext):
 # use this function with the Certificate Authority's public key to verify certificates signed by the Certificate Authority
 # if verification is successful, returns the unsigned certificate
 # if verification is unsuccessful, throws an AssertionError exception (catch it with a try/except!)
-def verify_certificate(public_key, certificate):
+def verify_certificate(public_key, certificate) -> str:
+    public_key = _to_public_key(public_key); certificate = _to_str(certificate)
     try:
         assert certificate[0] == 'D'
         return private_key_decrypt(public_key[0], 'E' + certificate[1:])
@@ -41,7 +79,7 @@ def verify_certificate(public_key, certificate):
     
 ## SYMMETRIC CRYPTOGRAPHY SIMULATIONS ##
 
-def generate_symmetric_key():
+def generate_symmetric_key() -> int:
     return generate_nonce()
 
 # use this to encrypt with a symmetric key

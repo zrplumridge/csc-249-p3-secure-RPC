@@ -85,12 +85,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     with conn:
         print(f"Connected established with {addr}")
         symmetric_key = TLS_handshake_server(conn, signed_certificate)
+        print(f"TLS handshake complete: established symmetric key '{symmetric_key}', acknowledging to client")
+        conn.sendall(bytes(cryptgraphy_simulator.symmetric_encrypt(symmetric_key, f"Symmetric key '{symmetric_key}' received"), 'utf-8'))
         while True:
             data = conn.recv(1024)
             if not data:
                 break
             print(f"Received client message: '{data!r}' [{len(data)} bytes]")
-            message = cryptgraphy_simulator.tls_decode(data.decode('utf-8'))
+            message = cryptgraphy_simulator.tls_decode(symmetric_key, data.decode('utf-8'))
             print(f"Decoded message '{message}' from client")
             response = process_message(message)
             print(f"Responding '{response}' to the client")
