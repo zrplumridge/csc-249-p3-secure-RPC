@@ -1,0 +1,35 @@
+1. Overview of Application
+
+This application is based around a client that prompts the user for a phrase and a server that mirrors said phrase. 
+For additional security and to learn about the relevant concepts, the client communicates with the server through a VPN
+and a certificate authority is consulted to conduct a TLS handshake for encryption of following messages. 
+
+2. Format of an unsigned certificate
+
+TODO ---------add this after solidified in code!! ------- 
+
+3. Example output
+
+Output is unmodified mirror of input. See screenshot. 
+TODO -------once it runs, screenshot of code running with input------
+
+4. **A walkthorough of the steps of a TLS handshake, and what each step accomplishes**
+        * For example, one step will be: "The client encrypts the generated symmetric key before sending it to the server. If it doesn't, the VPN will be able to read the symmetric key in transit and use it to decrypt further secure communications between the client and server encrypted and HMAC'd with that key."
+server and client both get public key from certificate authority
+server reaches out to certificate authority
+
+client reaches out to server (in this case, through a vpn)
+
+
+5. A description of two ways in which our simulation fails to achieve real security, and how these failures might be exploited by a malicious party. This is one place you can earn extra credit by discussing some less-obvious exploits. Some options for discussion are:
+        * The asymmetric key generation scheme
+        * The encryption/decryption/HMAC/verification algorithms
+        * The certificate authority's public key distribution system
+        * The use of python's "eval()" function
+    To begin with, all of the relevant documents are in the same folder with limited divides. 
+    Therefore, if one had access to one document, one would most likely have access to all of the documents and therefore even more easily be able to pick out the other weak links. 
+
+
+6. Acknowledgements
+Thank you to the class as a whole for bringing up errors so we could figure out some were just inherent to the problem or the given code. 
+I confirmed with some specific classmates the steps we're doing but I don't know their names unfortunately. 
