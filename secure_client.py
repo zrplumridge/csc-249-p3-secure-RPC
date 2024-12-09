@@ -61,12 +61,12 @@ def TLS_handshake_client(connection, server_ip=SERVER_IP, server_port=SERVER_POR
     print("Signed certificate received")
     signed_certificate = data.decode('utf-8')
     # if the certificate agrees with the certificate authority then proceed 
-    unsigned_certificate = cryptgraphy_simulator.verify_certificate(int(CA_public_key), signed_certificate)
+    unsigned_certificate = cryptgraphy_simulator.verify_certificate(CA_public_key, signed_certificate)
     print("Certificate authority concurs")
-    certificateInfo = unsigned_certificate.split( )
-    if server_IP == int(certificateInfo[0]):
+    certificateInfo = unsigned_certificate.split('~')
+    if SERVER_IP == certificateInfo[0]:
         print("IP information matches")
-        if server_PORT == int(certificateInfo[2]):
+        if SERVER_PORT == int(certificateInfo[2]):
             print("Port information matches")
         else:
             raise PortMismatch("Port communicated does not match port received from")
@@ -74,8 +74,10 @@ def TLS_handshake_client(connection, server_ip=SERVER_IP, server_port=SERVER_POR
         raise IPMismatch("IP addresses do not match")
 
     symmetric_key = cryptgraphy_simulator.generate_symmetric_key()
-    encrypted_symmetric_key = cryptgraphy_simulator.public_key_encrypt(int(certificateInfo[4]), symmetric_key)
-    conn.sendall(bytes(encode_message(encrypted_symmetric_key), 'utf-8'))
+    print(symmetric_key)
+    encrypted_symmetric_key = cryptgraphy_simulator.public_key_encrypt(certificateInfo[4], symmetric_key)
+    print(encrypted_symmetric_key)
+    connection.sendall(bytes(encrypted_symmetric_key, 'utf-8'))
     #  * Verify the certificate with the certificate authority's public key
     #    * Use cryptography_simulator.verify_certificate()
     #  * Extract the server's public key, IP address, and port from the certificate
