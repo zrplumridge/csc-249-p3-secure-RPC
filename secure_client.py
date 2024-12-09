@@ -99,7 +99,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     symmetric_key = TLS_handshake_client(s, SERVER_IP, SERVER_PORT)
     print(f"TLS handshake complete: sent symmetric key '{symmetric_key}', waiting for acknowledgement")
     data = s.recv(1024).decode('utf-8')
-    print(f"Received acknowledgement '{cryptgraphy_simulator.symmetric_decrypt(symmetric_key, data)}', preparing to send message")
+    print("received acknowledgement data " + data)
+    print(f"Received acknowledgement '{cryptgraphy_simulator.tls_decode(symmetric_key, data)}', preparing to send message")
     MSG = cryptgraphy_simulator.tls_encode(symmetric_key,MSG)
     print(f"Sending message '{MSG}' to the server")
     s.sendall(bytes(MSG, 'utf-8'))
@@ -107,5 +108,5 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     data = s.recv(1024)
 
 print(f"Received raw response: '{data}' [{len(data)} bytes]")
-print(f"Decoded message '{cryptgraphy_simulator.tls_decode(symmetric_key, data.decode('utf-8'))} from server")
+print(f"Decoded message '{cryptgraphy_simulator.tls_decode(symmetric_key, data.decode('utf-8'))}' from server")
 print("client is done!")

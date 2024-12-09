@@ -83,15 +83,17 @@ def generate_symmetric_key() -> int:
     return generate_nonce()
 
 # use this to encrypt with a symmetric key
-def symmetric_encrypt(key, message):
+def symmetric_encrypt(key, message) -> str:
+    key = _to_int(key); message = _to_str(message)
     return 'symmetric_' + str(key) + '[' + message + ']'
 
 # use this to decrypt with a symmetric key
-def symmetric_decrypt(key, cyphertext):
-    if len(cyphertext) < 4 or cyphertext[:2] != 'E_' or cyphertext[2] not in '0123456789' or '[' not in cyphertext or cyphertext[-1] != ']':
+def symmetric_decrypt(key, cyphertext) -> str:
+    key = _to_int(key); cyphertext = _to_str(cyphertext)
+    if len(cyphertext) < 12 or cyphertext[:10] != 'symmetric_' or cyphertext[10] not in '0123456789' or '[' not in cyphertext or cyphertext[-1] != ']':
         raise AssertionError('"{}" is not formatted as an symmetric cyphertext'.format(cyphertext))
     try:
-        cyphertext_key = int(cyphertext[2:cyphertext.index('[')])
+        cyphertext_key = int(cyphertext[10:cyphertext.index('[')])
     except TypeError:
         raise AssertionError('"{}" does not have a properly formatted symmetric key'.format(cyphertext))
     if cyphertext_key != key:
@@ -99,7 +101,8 @@ def symmetric_decrypt(key, cyphertext):
     return cyphertext[cyphertext.index('[')+1:-1]
 
 # use this to generate a simulated HMAC
-def generate_HMAC(key, message):
+def generate_HMAC(key, message) -> int:
+    key = _to_int(key); message = _to_str(message)
     prng = random.Random(str(key) + message)
     return prng.randrange(1, 100000)
 

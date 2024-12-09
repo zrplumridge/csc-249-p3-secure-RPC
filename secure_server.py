@@ -74,11 +74,12 @@ def TLS_handshake_server(connection, signed_certificate):
     #    * A signed certificate variable should be available as 'signed_certificate'
     #  * Receive an encrypted symmetric key from the client
     #  * Return the symmetric key for use in further communications with the client
-    return encrypted_symmetric_key
+    return symmetric_key
 
 def process_message(message):
     # Change this function to change the service your server provides
     # Right now, this is an echo server, which is fine, but a bit dull
+    message = message + "beep"
     return message
 
 print("server starting - listening for connections at IP", SERVER_IP, "and port", SERVER_PORT)
@@ -90,7 +91,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         print(f"Connected established with {addr}")
         symmetric_key = TLS_handshake_server(conn, signed_certificate)
         print(f"TLS handshake complete: established symmetric key '{symmetric_key}', acknowledging to client")
-        conn.sendall(bytes(cryptgraphy_simulator.symmetric_encrypt(symmetric_key, f"Symmetric key '{symmetric_key}' received"), 'utf-8'))
+        conn.sendall(bytes(cryptgraphy_simulator.tls_encode(symmetric_key, f"Symmetric key '{symmetric_key}' received"), 'utf-8'))
         while True:
             data = conn.recv(1024)
             if not data:

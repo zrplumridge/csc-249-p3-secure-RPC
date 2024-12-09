@@ -10,8 +10,8 @@ TODO ---------add this after solidified in code!! -------
 
 3. Example output
 
-Output is unmodified mirror of input. See screenshot. 
-TODO -------once it runs, screenshot of code running with input------
+Output is input + "beep" added immediately after
+Hello, world --> Hello, worldbeep 
 
 4. **A walkthorough of the steps of a TLS handshake, and what each step accomplishes**
         * For example, one step will be: "The client encrypts the generated symmetric key before sending it to the server. If it doesn't, the VPN will be able to read the symmetric key in transit and use it to decrypt further secure communications between the client and server encrypted and HMAC'd with that key."
@@ -32,6 +32,8 @@ client also now has the server's public key. this was enclosed within the certif
 client generates a symmetric key for future use. client uses server's public key to encrypt the symmetric key and send it to the server. again to prevent intermediates from gaining access to the symmetric key (VPN here would be the biggest concern)
 all future messages between the two are encrypted using this symmetric key. 
 
+HMAC is also used for authentication. pretty much just another number also used with the same encryption process. 
+
 
 5. A description of two ways in which our simulation fails to achieve real security, and how these failures might be exploited by a malicious party. This is one place you can earn extra credit by discussing some less-obvious exploits. Some options for discussion are:
         * The asymmetric key generation scheme
@@ -45,6 +47,8 @@ This asymmetric key generation method can be reproduced.
 An unsigned certificate could contain a (small) virus that could take down the certificate authority, or if the CA has preventative methods in place, be eventually sent to the client. 
 It would not automatically be clear that it's a virus due to encryption. 
 Other parties could gain access to a signed certificate, use the CA's public key to decode it, and therefore have access to the server's public key. This would allow them to decode symmetric codes sent to the server. 
+Everything is very clearly "encrypted" using methods designated in the encryption, and all using easily-read (by both human and machine) words and numbers. 
+The VPN has full access to the message, which would not be true (hopefully & if done properly). Technically it needs some decryption but that would just have to involve stripping some outer information of set length. 
 
 6. Acknowledgements
 Thank you to the class as a whole for bringing up errors so we could figure out some were just inherent to the problem or the given code. 
